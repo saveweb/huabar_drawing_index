@@ -126,7 +126,7 @@ jid: {jid}
             f.write("原图: ")
             if is_keyable(original_url):
                 key = get_key(original_url)
-                f.write(f"![{key}](notes_data/{key})\n\n")
+                f.write(f"![{key}](notes_data/{key})"+'{loading="lazy"}\n\n')
             else:
                 f.write(f"不可用 ({original_url})\n\n")
             f.write("原始工程文件: \n")
