@@ -1,0 +1,8 @@
+keys/
+.venv
+__pycache__
+*-*
+*.csv
+*.zst
+*.db
+.vscode
