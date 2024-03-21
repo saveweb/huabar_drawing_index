@@ -159,10 +159,12 @@ async def download_notes_data(client, jid, notes):
                 cors.append(
                     download_to_bak(sem=sem, client=client, ia_url=ia_url, jid=jid, key=key)
                 )
+            elif url == "http://huaba-operate.oss-cn-hangzhou.aliyuncs.com/deletepic.png":
+                pass
             elif urltype == W:
-                raise
+                assert False, url
             elif urltype == B:
-                raise
+                assert False, url
     
     await asyncio.gather(*cors)
 
