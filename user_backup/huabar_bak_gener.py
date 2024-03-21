@@ -164,6 +164,8 @@ async def download_notes_data(client, jid, notes):
             elif urltype == W:
                 assert False, url
             elif urltype == B:
+                pass
+            else:
                 assert False, url
     
     await asyncio.gather(*cors)
