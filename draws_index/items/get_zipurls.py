@@ -1,10 +1,10 @@
-import requests
+import httpx
 from tqdm import tqdm
 
 ITEMS = open(
     "huabar_items.txt", "r"
 ).read().splitlines()
-ss = requests.Session()
+ss = httpx.Client(follow_redirects=True)
 
 class Asset:
     # TYPE: str # "ali" or "qiniu"
