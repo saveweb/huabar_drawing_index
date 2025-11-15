@@ -24,17 +24,17 @@ def get_key(url: str)->str:
 
 def write_user_bak_meta(jid: str, notes: list[dict]):
     usr_dir = jid.split('@')[0]
-    os.makedirs(f'user_backup/{usr_dir}', exist_ok=True)
+    os.makedirs(f'user_backups/{usr_dir}', exist_ok=True)
 
-    with open(f'user_backup/{usr_dir}/notes.json', 'w') as f:
+    with open(f'user_backups/{usr_dir}/notes.json', 'w') as f:
         f.write(json.dumps(notes, ensure_ascii=False, indent=2))
 
 async def download_to_bak(sem:asyncio.Semaphore, client:httpx.AsyncClient, url, jid, key):
     usr_dir = jid.split('@')[0]
-    path = f'user_backup/{usr_dir}/notes_data/{key}'
+    path = f'user_backups/{usr_dir}/notes_data/{key}'
     if os.path.exists(path):
         return
-    os.makedirs(f'user_backup/{usr_dir}/notes_data/', exist_ok=True)
+    os.makedirs(f'user_backups/{usr_dir}/notes_data/', exist_ok=True)
     async with sem:
         print("downloading", key)
         r = await client.get(url, follow_redirects=True)
@@ -80,8 +80,8 @@ async def main():
 
 def gen_markdown(jid, notes):
     usr_dir = jid.split('@')[0]
-    os.makedirs(f'user_backup/{usr_dir}', exist_ok=True)
-    with open(f'user_backup/{usr_dir}/notes.md', 'w') as f:
+    os.makedirs(f'user_backups/{usr_dir}', exist_ok=True)
+    with open(f'user_backups/{usr_dir}/notes.md', 'w') as f:
         f.write(f"""\
 # {notes[0]['payload']['authorname']} 的画吧作品备份
 
@@ -176,22 +176,22 @@ async def download_notes_data(client, jid, notes):
     
     await asyncio.gather(*cors)
 
-    # cd user_backup/$jid && pwd && pandoc --from markdown --to html notes.md -s > notes.html
+    # cd user_backups/$jid && pwd && pandoc --from markdown --to html notes.md -s > notes.html
     import subprocess
     usr_dir = jid.split('@')[0]
     subprocess.run(['pandoc', '--from', 'markdown', '--to', 'html',
-                    f'user_backup/{usr_dir}/notes.md', '-s',
-                    '-o', f'user_backup/{usr_dir}/notes.html'], check=True)
+                    f'user_backups/{usr_dir}/notes.md', '-s',
+                    '-o', f'user_backups/{usr_dir}/notes.html'], check=True)
     # rm ${jid}.zip
-    if os.path.exists(f'user_backup/{usr_dir}.zip'):
-        os.unlink(f'user_backup/{usr_dir}.zip')
+    if os.path.exists(f'user_backups/{usr_dir}.zip'):
+        os.unlink(f'user_backups/{usr_dir}.zip')
     # zip -r $jid $jid
-    subprocess.run(['zip', '-r', f'user_backup/{usr_dir}.zip', usr_dir], check=True)
+    subprocess.run(['zip', '-r', f'user_backups/{usr_dir}.zip', usr_dir], check=True)
 
     print(f"https://huabar-takeout-preview.saveweb.org/{usr_dir}/notes.html")
     print(f"https://huabar-takeout-preview.saveweb.org/{usr_dir}.zip")
 
-    print("To clean up, run: rm -rf user_backup/*")
+    print("To clean up, run: rm -rf user_backups/*")
 
 if __name__ == "__main__":
     asyncio.run(main())
