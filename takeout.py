@@ -71,7 +71,7 @@ def post_process(jid: str):
     if os.path.exists(f'user_backups/{usr_dir}.zip'):
         os.unlink(f'user_backups/{usr_dir}.zip')
     # zip -r $jid $jid
-    subprocess.run(['zip', '-r', f'user_backups/{usr_dir}.zip', usr_dir], check=True)
+    subprocess.run(['zip', '-r', f'user_backups/{usr_dir}.zip', f'user_backups/{usr_dir}'], check=True)
 
     print(f"https://huabar-takeout-preview.saveweb.org/{usr_dir}/notes.html")
     print(f"https://huabar-takeout-preview.saveweb.org/{usr_dir}.zip")
