@@ -103,6 +103,7 @@ func connect_to_mongodb() {
 }
 
 func load_data() {
+	fmt.Println("Loading data...")
 	Lock.Lock()
 	defer Lock.Unlock()
 
@@ -113,7 +114,7 @@ func load_data() {
 }
 
 func _load_data() {
-	fmt.Println("Loading data...")
+	fmt.Println("Loading data... (inside)")
 	file, err := os.Open("jid_authorname_map/jid_authorname_maped.csv")
 	if err != nil {
 		panic(err)
@@ -133,10 +134,10 @@ func _load_data() {
 }
 
 func unload_data() {
+	fmt.Println("Unloading data...")
 	Lock.Lock()
 	defer Lock.Unlock()
 
-	fmt.Println("Unloading data...")
 	jidAuthorNameMap = make(map[JidAuthorName]bool)
 	runtime.GC()
 	fmt.Println("Data unloaded!")
@@ -158,7 +159,10 @@ func auto_unload_data() {
 func search_authorname(q string, limit int, TYPE string) ([]JidAuthorName, error) {
 	var results []JidAuthorName
 
-	load_data()
+	Lock.Lock()
+	defer Lock.Unlock()
+
+	_load_data()
 
 	if TYPE == "like" {
 		for jidAuthorName := range jidAuthorNameMap {
