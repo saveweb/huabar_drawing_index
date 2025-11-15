@@ -179,9 +179,7 @@ async def download_notes_data(client, jid, notes):
     # cd user_backups/$jid && pwd && pandoc --from markdown --to html notes.md -s > notes.html
     import subprocess
     usr_dir = jid.split('@')[0]
-    subprocess.run(['pandoc', '--from', 'markdown', '--to', 'html',
-                    f'user_backups/{usr_dir}/notes.md', '-s',
-                    '-o', f'user_backups/{usr_dir}/notes.html'], check=True)
+    subprocess.run(['pandoc', f'user_backups/{usr_dir}/notes.md', '--standalone', '--output', f'user_backups/{usr_dir}/notes.html'], check=True)
     # rm ${jid}.zip
     if os.path.exists(f'user_backups/{usr_dir}.zip'):
         os.unlink(f'user_backups/{usr_dir}.zip')
