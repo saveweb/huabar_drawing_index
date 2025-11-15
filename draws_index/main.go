@@ -271,5 +271,20 @@ func main() {
 		return c.JSON(200, note)
 	})
 
+	r.GET("/api/invcode/:invcode", func(c echo.Context) error {
+		_invcode := c.Param("invcode")
+		invcode, err := strconv.ParseInt(_invcode, 10, 64)
+		if err != nil {
+			return c.JSON(400, map[string]any{"error": "invalid invcode"})
+		}
+
+		note := make([]primitive.M, 0)
+		if err = notes_collection.FindOne(context.Background(), bson.M{"payload.invcode": invcode}).Decode(&note); err != nil {
+			return c.JSON(500, map[string]any{"error": err.Error()})
+		}
+
+		return c.JSON(200, note)
+	})
+
 	r.Logger.Fatal(r.Start(":8080"))
 }
