@@ -1,3 +1,2 @@
-# huabar_draws_index
+# huabar_draws_takeout
 
-pandoc --from markdown --to html notes.md -s > notes.html
