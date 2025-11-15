@@ -65,7 +65,7 @@ def zipname2identifier(zipname:str):
 
 async def main():
     jid = input("jid: ") # zeg97iab-0@zhizhiyaya.com/HuaLiao
-    from_local = input("from_local:") # 0
+    from_local = input("from local notes.json? (y/n): [default: n]").strip().lower() == 'y'
     
     async with httpx.AsyncClient(timeout=60) as client:
         if from_local:
