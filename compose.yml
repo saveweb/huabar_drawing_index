@@ -1,0 +1,12 @@
+services:
+  huabar_draws_index:
+    build: .
+    container_name: huabar_draws_index
+    ports:
+      - "127.0.0.63:8539:8080"
+    volumes:
+      - ./jid_authorname_map:/app/jid_authorname_map
+      - ./db:/app/db
+    environment:
+      - MONGODB_URI=${MONGODB_URI}
+    restart: unless-stopped

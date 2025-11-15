@@ -6,8 +6,11 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
+	"runtime"
 	"strconv"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -16,7 +19,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/ncruces/go-sqlite3/driver"
+	_ "github.com/ncruces/go-sqlite3/embed"
 )
 
 type JidAuthorName struct {
@@ -33,11 +37,15 @@ var notes_collection *mongo.Collection
 
 var sql_db *sql.DB
 
-var jidAuthorNameMap = make(map[JidAuthorName]bool)
+var (
+	Lock             = sync.Mutex{}
+	jidAuthorNameMap = make(map[JidAuthorName]bool)
+)
 
 // The init function will run before our main function to establish a connection to MongoDB. If it cannot connect it will fail and the program will exit.
 func init() {
 	go load_data()
+	go auto_unload_data()
 	go connect_to_sqlite()
 	go connect_to_mongodb()
 }
@@ -96,6 +104,16 @@ func connect_to_mongodb() {
 }
 
 func load_data() {
+	Lock.Lock()
+	defer Lock.Unlock()
+
+	if len(jidAuthorNameMap) != 0 {
+		return
+	}
+	_load_data()
+}
+
+func _load_data() {
 	fmt.Println("Loading data...")
 	file, err := os.Open("jid_authorname_map/jid_authorname_maped.csv")
 	if err != nil {
@@ -115,8 +133,34 @@ func load_data() {
 	fmt.Println("Data loaded!")
 }
 
+func unload_data() {
+	Lock.Lock()
+	defer Lock.Unlock()
+
+	fmt.Println("Unloading data...")
+	jidAuthorNameMap = make(map[JidAuthorName]bool)
+	runtime.GC()
+	fmt.Println("Data unloaded!")
+}
+
+func auto_unload_data() {
+	timer := time.NewTicker(1 * time.Minute)
+	for {
+		<-timer.C
+		Lock.Lock()
+		if len(jidAuthorNameMap) == 0 {
+			Lock.Unlock()
+			continue
+		}
+		unload_data()
+	}
+}
+
 func search_authorname(q string, limit int, TYPE string) ([]JidAuthorName, error) {
 	var results []JidAuthorName
+
+	load_data()
+
 	if TYPE == "like" {
 		for jidAuthorName := range jidAuthorNameMap {
 			if strings.Contains(jidAuthorName.Name, q) {
