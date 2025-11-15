@@ -176,5 +176,22 @@ async def download_notes_data(client, jid, notes):
     
     await asyncio.gather(*cors)
 
+    # cd user_backup/$jid && pwd && pandoc --from markdown --to html notes.md -s > notes.html
+    import subprocess
+    usr_dir = jid.split('@')[0]
+    subprocess.run(['pandoc', '--from', 'markdown', '--to', 'html',
+                    f'user_backup/{usr_dir}/notes.md', '-s',
+                    '-o', f'user_backup/{usr_dir}/notes.html'], check=True)
+    # rm ${jid}.zip
+    if os.path.exists(f'user_backup/{usr_dir}.zip'):
+        os.unlink(f'user_backup/{usr_dir}.zip')
+    # zip -r $jid $jid
+    subprocess.run(['zip', '-r', f'user_backup/{usr_dir}.zip', usr_dir], check=True)
+
+    print(f"https://huabar-takeout-preview.saveweb.org/{usr_dir}/notes.html")
+    print(f"https://huabar-takeout-preview.saveweb.org/{usr_dir}.zip")
+
+    print("To clean up, run: rm -rf user_backup/*")
+
 if __name__ == "__main__":
     asyncio.run(main())
