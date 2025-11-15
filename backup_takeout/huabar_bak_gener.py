@@ -11,7 +11,7 @@ from url_type import (
     get_urltype
 )
 
-API_BASE = "http://localhost:8080/api/"
+API_BASE = "http://huabar_draws_index:8080/api/"
 
 def is_keyable(url: str)->bool:
     if not url:

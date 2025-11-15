@@ -1,4 +1,0 @@
-requests
-httpx
-pymongo
-tqdm
