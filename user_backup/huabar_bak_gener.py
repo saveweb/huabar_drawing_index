@@ -29,7 +29,7 @@ def write_user_bak_meta(jid: str, notes: list[dict]):
     with open(f'{usr_dir}/notes.json', 'w') as f:
         f.write(json.dumps(notes, ensure_ascii=False, indent=2))
 
-async def download_to_bak(sem:asyncio.Semaphore, client:httpx.AsyncClient, ia_url, jid, key):
+async def download_to_bak(sem:asyncio.Semaphore, client:httpx.AsyncClient, url, jid, key):
     usr_dir = jid.split('@')[0]
     path = f'{usr_dir}/notes_data/{key}'
     if os.path.exists(path):
@@ -37,7 +37,7 @@ async def download_to_bak(sem:asyncio.Semaphore, client:httpx.AsyncClient, ia_ur
     os.makedirs(f'{usr_dir}/notes_data/', exist_ok=True)
     async with sem:
         print("downloading", key)
-        r = await client.get(ia_url, follow_redirects=True)
+        r = await client.get(url, follow_redirects=True)
         r.raise_for_status()
         with open(path, 'wb') as f:
             f.write(r.content)
@@ -157,11 +157,17 @@ async def download_notes_data(client, jid, notes):
                 # https://archive.org/download/huabar_ali-draw-20240130-00/ali-draw-20240130-000635.2413.zip/ali%2F0b9274cd8384cc3d936d2341c7f7bdbd.data
                 ia_url = f"https://archive.org/download/{identifier}/{zipname}/{urltype}/{key}"
                 cors.append(
-                    download_to_bak(sem=sem, client=client, ia_url=ia_url, jid=jid, key=key)
+                    download_to_bak(sem=sem, client=client, url=ia_url, jid=jid, key=key)
                 )
             elif url == "http://huaba-operate.oss-cn-hangzhou.aliyuncs.com/deletepic.png":
                 pass
             elif urltype == W:
+                if "notecontent" in url:
+                    newurl = 'http://[TODOTODO]:5000/' + url.split("notecontent.oss-cn-hangzhou.aliyuncs.com/")[1] # TODO
+                    cors.append(
+                        download_to_bak(sem=sem, client=client, url=newurl, jid=jid, key=get_key(url))
+                    )
+                    continue
                 assert False, url
             elif urltype == B:
                 pass
