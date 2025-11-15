@@ -1,7 +1,6 @@
 services:
   draws_index:
     build: ./draws_index
-    container_name: draws_index
     ports:
       - "127.0.0.63:8539:8080"
     volumes:
@@ -10,3 +9,4 @@ services:
     environment:
       - MONGODB_URI=${MONGODB_URI}
     restart: unless-stopped
+    
