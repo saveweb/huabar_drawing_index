@@ -12,8 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gin-gonic/gin"
-
+	"github.com/labstack/echo/v4"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -187,13 +186,13 @@ func search_authorname(q string, limit int, TYPE string) ([]JidAuthorName, error
 }
 
 func main() {
-	r := gin.Default()
+	r := echo.New()
 	// results := search_authorname_like("耑江古木")
 	// zeg97iab-0@zhizhiyaya.com/HuaLiao
-	r.GET("/api/search", func(c *gin.Context) {
-		q := c.Query("q")
-		limitStr := c.Query("limit")
-		TYPE := c.Query("type")
+	r.GET("/api/search", func(c echo.Context) error {
+		q := c.QueryParam("q")
+		limitStr := c.QueryParam("limit")
+		TYPE := c.QueryParam("type")
 
 		limit, err := strconv.Atoi(limitStr)
 		if err != nil {
@@ -203,40 +202,35 @@ func main() {
 			TYPE = "like"
 		}
 		if TYPE != "like" && TYPE != "equal" {
-			c.JSON(400, gin.H{"error": "invalid type"})
-			return
+			return c.JSON(400, map[string]any{"error": "invalid type"})
 		}
 
 		results, err := search_authorname(q, limit, TYPE)
 		if err != nil {
-			c.JSON(500, gin.H{"error": err.Error()})
-			return
+			return c.JSON(500, map[string]any{"error": err.Error()})
 		}
-		c.JSON(200, results)
+		return c.JSON(200, results)
 	})
 
-	r.GET("/api/get_zipname", func(c *gin.Context) {
-		key := c.Query("key")
+	r.GET("/api/get_zipname", func(c echo.Context) error {
+		key := c.QueryParam("key")
 		zipname, err := get_zipname_by_file_key(key)
 		if err != nil {
-			c.JSON(500, gin.H{"error": err.Error()})
-			return
+			return c.JSON(500, map[string]any{"error": err.Error()})
 		}
-		c.JSON(200, gin.H{"zipname": zipname})
+		return c.JSON(200, map[string]any{"zipname": zipname})
 	})
 
-	r.GET("/api/notes", func(c *gin.Context) {
-		jid := c.Query("jid")
+	r.GET("/api/notes", func(c echo.Context) error {
+		jid := c.QueryParam("jid")
 		if jid == "" {
-			c.JSON(400, gin.H{"error": "jid is required"})
-			return
+			return c.JSON(400, map[string]any{"error": "jid is required"})
 		}
 
 		var notes []primitive.M = make([]primitive.M, 0)
 		cur, err := notes_collection.Find(context.Background(), bson.M{"payload.jid": jid})
 		if err != nil {
-			c.JSON(500, gin.H{"error": err.Error()})
-			return
+			return c.JSON(500, map[string]any{"error": err.Error()})
 		}
 		defer cur.Close(context.Background())
 
@@ -244,19 +238,17 @@ func main() {
 			var note primitive.M
 			err := cur.Decode(&note)
 			if err != nil {
-				c.JSON(500, gin.H{"error": err.Error()})
-				return
+				return c.JSON(500, map[string]any{"error": err.Error()})
 			}
 			notes = append(notes, note)
 		}
 
 		if err := cur.Err(); err != nil {
-			c.JSON(500, gin.H{"error": err.Error()})
-			return
+			return c.JSON(500, map[string]any{"error": err.Error()})
 		}
 
-		c.JSON(200, notes)
+		return c.JSON(200, notes)
 	})
 
-	r.Run()
+	r.Logger.Fatal(r.Start(":8080"))
 }
