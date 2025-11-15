@@ -73,10 +73,14 @@ def post_process(jid: str):
     # zip -r $jid $jid
     subprocess.run(['zip', '-r', f'user_backups/{usr_dir}.zip', f'user_backups/{usr_dir}'], check=True)
 
-    print(f"https://huabar-takeout-preview.saveweb.org/{usr_dir}/notes.html")
-    print(f"https://huabar-takeout-preview.saveweb.org/{usr_dir}.zip")
+    print(f"备份预览: https://huabar-takeout-preview.saveweb.org/{usr_dir}/notes.html")
+    print(f"备份: https://huabar-takeout-preview.saveweb.org/{usr_dir}.zip")
+    print()
+    print("您好。请尽快下载压缩包，链接将于数周后失效。祝好。")
 
     print("To clean up, run: rm -rf user_backups/*")
+
+
 
 
 async def main():
