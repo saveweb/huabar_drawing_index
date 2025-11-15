@@ -4,7 +4,7 @@ go 1.25.4
 
 require (
 	github.com/labstack/echo/v4 v4.13.4
-	github.com/ncruces/go-sqlite3 v0.30.1
+	github.com/mattn/go-sqlite3 v1.14.32
 	go.mongodb.org/mongo-driver v1.17.6
 )
 
@@ -16,9 +16,7 @@ require (
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect
-	github.com/ncruces/julianday v1.0.0 // indirect
 	github.com/stretchr/testify v1.11.1 // indirect
-	github.com/tetratelabs/wazero v1.10.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect

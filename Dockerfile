@@ -3,7 +3,7 @@ COPY . /src
 
 WORKDIR /src
 
-RUN CGO_ENABLED=0 go build -ldflags="-extldflags=-static -s -w" -o huabar_draws_index
+RUN CGO_ENABLED=1 go build -ldflags="-extldflags=-static -s -w" -o huabar_draws_index
 
 FROM alpine:latest
 
