@@ -252,5 +252,24 @@ func main() {
 		return c.JSON(200, notes)
 	})
 
+	r.GET("/api/note/:noteid", func(c echo.Context) error {
+		_noteid := c.Param("noteid")
+		if _noteid == "" {
+			return c.JSON(400, map[string]any{"error": "noteid is required"})
+		}
+
+		noteid, err := strconv.ParseInt(_noteid, 10, 64)
+		if err != nil {
+			return c.JSON(400, map[string]any{"error": "invalid noteid"})
+		}
+
+		var note primitive.M
+		err = notes_collection.FindOne(context.Background(), bson.M{"noteid": noteid}).Decode(&note)
+		if err != nil {
+			return c.JSON(500, map[string]any{"error": err.Error()})
+		}
+		return c.JSON(200, note)
+	})
+
 	r.Logger.Fatal(r.Start(":8080"))
 }
