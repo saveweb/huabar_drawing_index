@@ -135,8 +135,6 @@ func _load_data() {
 
 func unload_data() {
 	fmt.Println("Unloading data...")
-	Lock.Lock()
-	defer Lock.Unlock()
 
 	jidAuthorNameMap = make(map[JidAuthorName]bool)
 	runtime.GC()
@@ -153,6 +151,7 @@ func auto_unload_data() {
 			continue
 		}
 		unload_data()
+		Lock.Unlock()
 	}
 }
 
