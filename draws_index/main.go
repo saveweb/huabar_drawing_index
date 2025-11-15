@@ -278,7 +278,7 @@ func main() {
 			return c.JSON(400, map[string]any{"error": "invalid invcode"})
 		}
 
-		note := make([]primitive.M, 0)
+		note := make(primitive.M, 0)
 		if err = notes_collection.FindOne(context.Background(), bson.M{"payload.invcode": invcode}).Decode(&note); err != nil {
 			return c.JSON(500, map[string]any{"error": err.Error()})
 		}
