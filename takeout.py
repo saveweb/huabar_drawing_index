@@ -11,7 +11,7 @@ from url_type import (
     get_urltype
 )
 
-API_BASE = "http://huabar_draws_index:8080/api/"
+API_BASE = "http://127.0.0.63:8539/api/"
 
 def is_keyable(url: str)->bool:
     if not url:
@@ -24,17 +24,17 @@ def get_key(url: str)->str:
 
 def write_user_bak_meta(jid: str, notes: list[dict]):
     usr_dir = jid.split('@')[0]
-    os.makedirs(f'{usr_dir}', exist_ok=True)
+    os.makedirs(f'user_backup/{usr_dir}', exist_ok=True)
 
-    with open(f'{usr_dir}/notes.json', 'w') as f:
+    with open(f'user_backup/{usr_dir}/notes.json', 'w') as f:
         f.write(json.dumps(notes, ensure_ascii=False, indent=2))
 
 async def download_to_bak(sem:asyncio.Semaphore, client:httpx.AsyncClient, url, jid, key):
     usr_dir = jid.split('@')[0]
-    path = f'{usr_dir}/notes_data/{key}'
+    path = f'user_backup/{usr_dir}/notes_data/{key}'
     if os.path.exists(path):
         return
-    os.makedirs(f'{usr_dir}/notes_data/', exist_ok=True)
+    os.makedirs(f'user_backup/{usr_dir}/notes_data/', exist_ok=True)
     async with sem:
         print("downloading", key)
         r = await client.get(url, follow_redirects=True)
@@ -80,8 +80,8 @@ async def main():
 
 def gen_markdown(jid, notes):
     usr_dir = jid.split('@')[0]
-    os.makedirs(f'{usr_dir}', exist_ok=True)
-    with open(f'{usr_dir}/notes.md', 'w') as f:
+    os.makedirs(f'user_backup/{usr_dir}', exist_ok=True)
+    with open(f'user_backup/{usr_dir}/notes.md', 'w') as f:
         f.write(f"""\
 # {notes[0]['payload']['authorname']} 的画吧作品备份
 

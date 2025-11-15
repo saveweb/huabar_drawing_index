@@ -8,5 +8,4 @@ services:
       - ./draws_index/db:/app/db
     environment:
       - MONGODB_URI=${MONGODB_URI}
-    restart: unless-stopped
-    
+    restart: always
