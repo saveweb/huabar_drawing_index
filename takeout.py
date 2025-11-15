@@ -62,6 +62,22 @@ def zipname2identifier(zipname:str):
     sp[3] = sp[3][:2]
     return 'huabar_' + '-'.join(sp)
 
+def post_process(jid: str):
+        # cd user_backups/$jid && pwd && pandoc --from markdown --to html notes.md -s > notes.html
+    import subprocess
+    usr_dir = jid.split('@')[0]
+    subprocess.run(['pandoc', f'user_backups/{usr_dir}/notes.md', '--standalone', '--output', f'user_backups/{usr_dir}/notes.html'], check=True)
+    # rm ${jid}.zip
+    if os.path.exists(f'user_backups/{usr_dir}.zip'):
+        os.unlink(f'user_backups/{usr_dir}.zip')
+    # zip -r $jid $jid
+    subprocess.run(['zip', '-r', f'user_backups/{usr_dir}.zip', usr_dir], check=True)
+
+    print(f"https://huabar-takeout-preview.saveweb.org/{usr_dir}/notes.html")
+    print(f"https://huabar-takeout-preview.saveweb.org/{usr_dir}.zip")
+
+    print("To clean up, run: rm -rf user_backups/*")
+
 
 async def main():
     jid = input("jid: ") # zeg97iab-0@zhizhiyaya.com/HuaLiao
@@ -77,6 +93,8 @@ async def main():
             write_user_bak_meta(jid, notes)
         await download_notes_data(client, jid, notes)
         gen_markdown(jid, notes)
+
+    post_process(jid)
 
 def gen_markdown(jid, notes):
     usr_dir = jid.split('@')[0]
@@ -175,21 +193,6 @@ async def download_notes_data(client, jid, notes):
                 assert False, url
     
     await asyncio.gather(*cors)
-
-    # cd user_backups/$jid && pwd && pandoc --from markdown --to html notes.md -s > notes.html
-    import subprocess
-    usr_dir = jid.split('@')[0]
-    subprocess.run(['pandoc', f'user_backups/{usr_dir}/notes.md', '--standalone', '--output', f'user_backups/{usr_dir}/notes.html'], check=True)
-    # rm ${jid}.zip
-    if os.path.exists(f'user_backups/{usr_dir}.zip'):
-        os.unlink(f'user_backups/{usr_dir}.zip')
-    # zip -r $jid $jid
-    subprocess.run(['zip', '-r', f'user_backups/{usr_dir}.zip', usr_dir], check=True)
-
-    print(f"https://huabar-takeout-preview.saveweb.org/{usr_dir}/notes.html")
-    print(f"https://huabar-takeout-preview.saveweb.org/{usr_dir}.zip")
-
-    print("To clean up, run: rm -rf user_backups/*")
 
 if __name__ == "__main__":
     asyncio.run(main())
